@@ -21,12 +21,14 @@ import com.costelas.notes.ui.components.SearchBar
 import com.costelas.notes.ui.components.TitleText
 import com.costelas.notes.ui.navigation.Screens
 import com.costelas.notes.ui.screens.AppViewModel
+import com.costelas.notes.ui.screens.got.GoTScreen
 import com.costelas.notes.ui.screens.home.notes.Notes
 import com.costelas.notes.ui.screens.home.notes.NotesViewModel
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseUser
+import com.google.gson.Gson
 
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
@@ -38,7 +40,6 @@ fun HomeScreen(
 ) {
 
     var searchQuery by remember { mutableStateOf("") }
-    var isDialogVisible by remember { mutableStateOf(false) }
 
     val notesViewModel: NotesViewModel = hiltViewModel()
     val pagerState = rememberPagerState()
@@ -105,30 +106,14 @@ fun HomeScreen(
             ) { page: Int ->
                 when (page) {
                     0 -> Notes(viewModel = notesViewModel, navController = navController)
-                    1 -> {}
+                    1 -> GoTScreen(
+                        navController = navController,
+                        onNoteCreated = { note ->
+                            navController.navigate(Screens.Edit.route + "?note=${Gson().toJson(note)}")
+                        }
+                    )
                 }
             }
         }
-
-//        if (isDialogVisible) {
-//            AlertDialog(
-//                onDismissRequest = { isDialogVisible = false },
-//                confirmButton = {
-//                    TextButton(onClick = signOut) {
-//                        Text(text = "Yes")
-//                    }
-//                },
-//                dismissButton = {
-//                    TextButton(onClick = { isDialogVisible = false }) {
-//                        Text(text = "No")
-//                    }
-//                },
-//                title = {
-//                    Text(text = "Sign out?")
-//                },
-//                backgroundColor = MaterialTheme.colors.background,
-//                contentColor = MaterialTheme.colors.onBackground
-//            )
-//        }
     }
 }

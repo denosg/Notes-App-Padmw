@@ -37,10 +37,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-//    private fun signOut() {
-//        auth.signOut()
-//        startActivity(Intent(this, SignInActivity::class.java))
-//        finish()
-//    }
 }
