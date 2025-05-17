@@ -1,6 +1,5 @@
 package com.costelas.notes.ui
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -33,16 +32,15 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colors.background) {
                     App(
                         user = auth.currentUser!!,
-                        signOut = { signOut() }
                     )
                 }
             }
         }
     }
 
-    private fun signOut() {
-        auth.signOut()
-        startActivity(Intent(this, SignInActivity::class.java))
-        finish()
-    }
+//    private fun signOut() {
+//        auth.signOut()
+//        startActivity(Intent(this, SignInActivity::class.java))
+//        finish()
+//    }
 }

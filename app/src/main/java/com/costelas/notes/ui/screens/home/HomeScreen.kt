@@ -35,7 +35,6 @@ fun HomeScreen(
     viewModel: AppViewModel,
     navController: NavHostController,
     user: FirebaseUser,
-    signOut: () -> Unit
 ) {
 
     var searchQuery by remember { mutableStateOf("") }
@@ -77,7 +76,9 @@ fun HomeScreen(
                     pagerState = pagerState,
                     modifier = Modifier.padding(16.dp),
                 )
-                IconButton(onClick = { isDialogVisible = true }) {
+                IconButton(onClick = {
+                    navController.navigate(Screens.Settings.route)
+                }) {
                     Image(
                         modifier = Modifier
                             .clip(CircleShape)
@@ -109,25 +110,25 @@ fun HomeScreen(
             }
         }
 
-        if (isDialogVisible) {
-            AlertDialog(
-                onDismissRequest = { isDialogVisible = false },
-                confirmButton = {
-                    TextButton(onClick = signOut) {
-                        Text(text = "Yes")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { isDialogVisible = false }) {
-                        Text(text = "No")
-                    }
-                },
-                title = {
-                    Text(text = "Sign out?")
-                },
-                backgroundColor = MaterialTheme.colors.background,
-                contentColor = MaterialTheme.colors.onBackground
-            )
-        }
+//        if (isDialogVisible) {
+//            AlertDialog(
+//                onDismissRequest = { isDialogVisible = false },
+//                confirmButton = {
+//                    TextButton(onClick = signOut) {
+//                        Text(text = "Yes")
+//                    }
+//                },
+//                dismissButton = {
+//                    TextButton(onClick = { isDialogVisible = false }) {
+//                        Text(text = "No")
+//                    }
+//                },
+//                title = {
+//                    Text(text = "Sign out?")
+//                },
+//                backgroundColor = MaterialTheme.colors.background,
+//                contentColor = MaterialTheme.colors.onBackground
+//            )
+//        }
     }
 }
