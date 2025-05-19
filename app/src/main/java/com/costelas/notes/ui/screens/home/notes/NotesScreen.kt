@@ -3,16 +3,13 @@ package com.costelas.notes.ui.screens.home.notes
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.DismissDirection
-import androidx.compose.material.DismissValue
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.SwipeToDismiss
-import androidx.compose.material.rememberDismissState
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,6 +22,7 @@ import com.costelas.notes.ui.components.BodyText
 import com.costelas.notes.ui.components.HeadingText
 import com.costelas.notes.ui.components.NoteBox
 import com.costelas.notes.ui.navigation.Screens
+import com.costelas.notes.common.models.Note
 import com.google.gson.Gson
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
@@ -35,6 +33,9 @@ fun Notes(
     navController: NavHostController
 ) {
     val notes = viewModel.notes.value
+
+    var notePendingDelete by remember { mutableStateOf<Note?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
 
     if (notes.isEmpty()) {
         Column(
@@ -68,22 +69,12 @@ fun Notes(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(notes.filter { note ->
+            val filteredNotes = notes.filter { note ->
                 note.title.contains(filter, ignoreCase = true) || note.text.contains(filter, ignoreCase = true)
-            }) { note ->
-                val dismissState = rememberDismissState(
-                    confirmStateChange = { dismissValue ->
-                        if (dismissValue == DismissValue.DismissedToStart || dismissValue == DismissValue.DismissedToEnd) {
-                            viewModel.removeNote(note.uid)
-                            true
-                        } else false
-                    }
-                )
-                SwipeToDismiss(
-                    state = dismissState,
-                    background = {},
-                    directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart)
-                ) {
+            }
+
+            items(filteredNotes) { note ->
+                key(note.uid) {
                     NoteBox(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -92,10 +83,50 @@ fun Notes(
                         onClick = {
                             val data = Uri.encode(Gson().toJson(note))
                             navController.navigate(Screens.Edit.route + "?note=$data")
+                        },
+                        onLongClick = {
+                            notePendingDelete = note
+                            showDialog = true
                         }
                     )
                 }
             }
         }
+    }
+
+    if (showDialog && notePendingDelete != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+                notePendingDelete = null
+            },
+            title = {
+                Text(text = "Delete Note?")
+            },
+            text = {
+                Text("Are you sure you want to delete \"${notePendingDelete?.title}\"?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        notePendingDelete?.let { viewModel.removeNote(it.uid) }
+                        showDialog = false
+                        notePendingDelete = null
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                        notePendingDelete = null
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

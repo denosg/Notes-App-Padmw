@@ -33,22 +33,17 @@ import com.google.gson.Gson
 @Composable
 fun App(
     user: FirebaseUser,
+    onToggleTheme: (Boolean) -> Unit
 ) {
-    val viewModel: AppViewModel = hiltViewModel()
-    val settingsViewModel: SettingsViewModel = hiltViewModel();
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
     val navController = rememberAnimatedNavController()
     val context = LocalContext.current
 
     AnimatedNavHost(navController = navController, startDestination = Screens.Home.route) {
         composable(Screens.Home.route) {
-            HomeScreen(viewModel, navController, user)
+            HomeScreen(hiltViewModel(), navController, user)
         }
-        composable(
-            Screens.Edit.route + "?note={data}",
-            arguments = listOf(navArgument("data") {
-                nullable = true
-            })
-        ) {
+        composable(Screens.Edit.route + "?note={data}", arguments = listOf(navArgument("data") { nullable = true })) {
             val data = it.arguments?.getString("data")
             val note = Gson().fromJson(data, Note::class.java)
             EditScreen(navController, note)
@@ -57,7 +52,7 @@ fun App(
             SettingsScreen(
                 navController = navController,
                 viewModel = settingsViewModel,
-                onThemeToggle = { isDark -> },
+                onThemeToggle = onToggleTheme,
                 onLogout = {
                     Firebase.auth.signOut()
                     context.startActivity(Intent(context, SignInActivity::class.java))

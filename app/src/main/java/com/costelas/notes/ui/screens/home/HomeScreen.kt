@@ -90,12 +90,12 @@ fun HomeScreen(
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            SearchBar(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                onSearch = {},
-                focusManager = focusManager
-            )
+//            SearchBar(
+//                value = searchQuery,
+//                onValueChange = { searchQuery = it },
+//                onSearch = {},
+//                focusManager = focusManager
+//            )
 
             HorizontalPager(
                 count = 2,
